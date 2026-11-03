@@ -28,6 +28,8 @@
   "setInsertDesc": "本地资源不依赖网络、可离线查看；外链方式不占笔记仓库空间",
   "setInsertAsset": "下载到 assets（推荐）",
   "setInsertCdn": "直接引用外链",
+  "setNameOnly": "只匹配名称",
+  "setNameOnlyDesc": "开启后搜索只比对图标名和 slug，不匹配别名与分类，结果更少更准",
   "setRecent": "最近使用数量",
   "setRecentDesc": "面板顶部优先展示的最近使用图标个数，0 表示关闭",
   "setBreadcrumb": "面包屑按钮",

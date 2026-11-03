@@ -29,6 +29,7 @@ const DEFAULT_CONF = {
     cdn: "jsdelivr",
     cdnCustom: "",
     insertMode: "asset",
+    nameOnly: false,
     recentLimit: 12,
     showBreadcrumb: true,
     showStatusBar: false,
@@ -236,9 +237,16 @@ class DashboardIconsPlugin extends Plugin {
         const terms = kw.split(/\s+/).filter(Boolean);
         const scored = [];
         for (const item of list) {
-            const hay = item._h || (item._h = (
-                item.s + " " + item.n + " " + (item.a || "") + " " + (item.c || []).join(" ")
-            ).toLowerCase());
+            // 两种匹配范围各缓存一份，切换开关时不用重算
+            const cacheKey = this.conf.nameOnly ? "_hn" : "_h";
+            let hay = item[cacheKey];
+            if (!hay) {
+                hay = this.conf.nameOnly
+                    ? item.s + " " + item.n
+                    : item.s + " " + item.n + " " + (item.a || "") + " " + (item.c || []).join(" ");
+                item[cacheKey] = hay.toLowerCase();
+                hay = item[cacheKey];
+            }
             if (!terms.every((t) => hay.indexOf(t) >= 0)) continue;
 
             let score = 3;
@@ -794,6 +802,11 @@ class DashboardIconsPlugin extends Plugin {
             insertSelect.appendChild(option);
         });
 
+        const nameOnlyInput = document.createElement("input");
+        nameOnlyInput.type = "checkbox";
+        nameOnlyInput.className = "b3-switch fn__flex-center";
+        nameOnlyInput.checked = !!this.conf.nameOnly;
+
         const recentInput = document.createElement("input");
         recentInput.type = "number";
         recentInput.min = "0";
@@ -816,6 +829,7 @@ class DashboardIconsPlugin extends Plugin {
                 this.conf.cdn = cdnSelect.value;
                 this.conf.cdnCustom = cdnInput.value.trim();
                 this.conf.insertMode = insertSelect.value;
+                this.conf.nameOnly = nameOnlyInput.checked;
                 this.conf.recentLimit = Math.min(20, Math.max(0, Number(recentInput.value) || 0));
                 this.conf.showBreadcrumb = breadcrumbInput.checked;
                 this.conf.showStatusBar = statusInput.checked;
@@ -845,6 +859,12 @@ class DashboardIconsPlugin extends Plugin {
             direction: "row",
             description: this.i18n.setInsertDesc,
             createActionElement: () => insertSelect,
+        });
+        this.setting.addItem({
+            title: this.i18n.setNameOnly,
+            direction: "row",
+            description: this.i18n.setNameOnlyDesc,
+            createActionElement: () => nameOnlyInput,
         });
         this.setting.addItem({
             title: this.i18n.setRecent,

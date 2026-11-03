@@ -30,6 +30,7 @@ Set insert mode to "Reference remote URL" if you prefer not to store files in yo
 
 - **Icon source**: jsDelivr (default) / GitHub raw / custom mirror
 - **Insert mode**: download to assets (recommended) / reference remote URL
+- **Match names only**: search only icon names and slugs, ignoring aliases and categories
 - **Recent icons**: 0 disables
 - **Breadcrumb button / status bar button**: toggles
 

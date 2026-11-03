@@ -28,6 +28,8 @@
   "setInsertDesc": "Local assets work offline; remote links do not consume workspace space",
   "setInsertAsset": "Download to assets (recommended)",
   "setInsertCdn": "Reference remote URL",
+  "setNameOnly": "Match names only",
+  "setNameOnlyDesc": "Search only icon names and slugs, ignoring aliases and categories. Fewer but more precise results",
   "setRecent": "Recent icons",
   "setRecentDesc": "How many recently used icons to pin on top, 0 disables it",
   "setBreadcrumb": "Breadcrumb button",
