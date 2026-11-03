@@ -1,65 +1,60 @@
 # Dashboard 图标
 
-给思源笔记用的自托管服务图标库，数据来自 [homarr-labs/dashboard-icons](https://github.com/homarr-labs/dashboard-icons)。
+思源笔记插件。搜 [dashboard-icons](https://github.com/homarr-labs/dashboard-icons) 里的 3400 多个自托管服务图标，插进正文，或者设成文档图标。
 
-3400+ 个图标，覆盖 NAS、Docker、*arr、监控、智能家居、自建服务。搜索、点一下，插进正文或者直接变成文档图标。
+图标不是我画的，全部来自 homarr-labs/dashboard-icons。上游一直在加新的，这边用脚本同步。
 
 ![预览](preview.png)
 
-## 功能
+## 怎么用
 
-- 顶栏按钮 / 工具栏按钮 / 面包屑按钮 / 快捷键 `⌥⇧D`，四个入口都能打开
-- 本地索引搜索，2 ms 出结果，不联网
-- 12 个大类筛选：媒体、网络、监控、开发、云存储、安全、自动化、效率办公、AI、数据库、社交娱乐、其他
-- **左键**插入正文，**右键**菜单可设为文档图标、复制链接、仅下载、刷新预览
-- 自动跟随思源明暗主题选择图标变体（`-light` 给深色背景用，`-dark` 给浅色背景用）
-- 最近使用过的图标自动置顶
+顶栏、工具栏、面包屑栏都有入口，快捷键 `⌥⇧D`。
 
-## 两种落盘方式
+打开面板直接打字搜。左键把图标插到光标处，右键还有几个选项：设为文档图标、复制链接、只下载不插入。
 
-| 动作 | 落盘位置 | 引用路径 |
-| --- | --- | --- |
-| 设为文档图标 | `data/emojis/dashboard-icons/` | `/emojis/dashboard-icons/xxx.png` |
-| 插入正文 | `assets/dashboard-icons/` | `/assets/dashboard-icons/xxx.png` |
+搜索有优先级：slug 完全匹配 > slug 前缀 > 显示名前缀 > 其他。搜 `plex`，第一个就是 Plex，`plexdrive` 排在后面。
 
-都只下载你实际点过的那几个，不会把 3400 个图标灌进工作空间。想清空直接删这两个目录。
+## 关于分类
 
-如果不想占笔记仓库空间，在设置里把「正文插图方式」改成「直接引用外链」，图片就只存 CDN 地址。
+上游 3450 条记录里只有 1711 条填了分类，而且两套命名规则混着用（`Networking-Tools` 和 `network` 指的是同一件事）。我归成了 12 个大类，没分类的按 slug 关键词猜，猜不出来就丢进「其他」，现在有 1696 个在里面。
+
+所以分类只适合缩小范围，找具体图标还是靠搜。
+
+搜索默认匹配 slug、显示名、别名、分类。嫌结果多的话，设置里有「只匹配名称」开关，开了以后 `home` 从 125 条降到 25 条，`media server` 从 55 条降到 1 条。
+
+## 文件落在哪
+
+| 动作 | 位置 |
+| --- | --- |
+| 设为文档图标 | `data/emojis/dashboard-icons/` |
+| 插入正文 | `assets/dashboard-icons/` |
+
+都是点了才下载，不会把 3400 个图标塞进你的工作空间。想清理直接删这两个目录。
+
+不想占笔记仓库空间，把设置里的插图方式改成「直接引用外链」，图片只存 CDN 地址。
+
+## 明暗变体
+
+每个图标有两种变体，`-light` 是给深色背景用的，`-dark` 是给浅色背景用的。这个命名确实容易记反，插件的选择逻辑跟着思源的明暗模式走，你不用手动挑。
 
 ## 设置
 
-- **图标源**：jsDelivr（默认）/ GitHub raw / 自定义镜像
-- **正文插图方式**：下载到 assets（推荐）/ 引用外链
-- **只匹配名称**：开启后搜索只比对图标名和 slug，忽略别名与分类，结果更少更准
-- **最近使用数量**：0 关闭
-- **面包屑按钮 / 状态栏按钮**：开关
+图标源（jsDelivr / GitHub raw / 自定义镜像）、插图方式、只匹配名称、最近使用数量、面包屑按钮、状态栏按钮。
 
 ## 更新图标数据
-
-上游每天有新图标进来。拉一次元数据重新生成索引：
 
 ```bash
 python3 scripts/sync-icons.py
 ```
 
-脚本会抓 `metadata.json`，归一化分类、推断缺失分类、生成 `icons.json`（约 343 KB，gzip 后 59 KB）。重新打包即可。
+抓上游 `metadata.json`，归一化分类、补猜缺失的部分，生成 `icons.json`（343 KB，gzip 后 59 KB）。完事重新打包。
 
-集市图标和预览图由 `scripts/make-assets.py` 生成（需要 Pillow）。
+`scripts/make-assets.py` 重新生成集市图标和预览图，需要 Pillow。
 
-## 授权与商标
+## 授权
 
-本插件代码 MIT。图标资源来自 homarr-labs/dashboard-icons，**Apache-2.0**，许可证全文见 [`licenses/dashboard-icons-LICENSE.txt`](licenses/dashboard-icons-LICENSE.txt)。
+插件代码 MIT。
 
-图标文件通过官方 CDN 按需拉取，插件本身不打包任何图标资源。
+图标来自 homarr-labs/dashboard-icons，Apache-2.0，全文在 `licenses/dashboard-icons-LICENSE.txt`。插件不打包任何图标文件，全部按需从 CDN 拉。
 
-上游的商标声明，原样转述：
-
-> All product names, trademarks, and registered trademarks are the property of their respective owners. Icons are used for identification purposes only and do not imply endorsement.
-
-本插件是第三方作品，与 Homarr Labs 无隶属关系，未获其背书。
-
-## 已知限制
-
-- 移动端能用，但面板较窄时网格会退化成两三列
-- 设置文档图标依赖思源的表情目录机制，图标会出现在表情面板的 `dashboard-icons` 分组里
-- 上游约一半图标的分类字段为空，脚本用 slug 关键词推断，长尾服务会落到「其他」
+商标归各自所有者，图标只用于标识对应服务，不表示任何背书。这插件跟 Homarr Labs 没有隶属关系。

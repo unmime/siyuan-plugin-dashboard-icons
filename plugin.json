@@ -21,9 +21,9 @@
     "zh-CN": "Dashboard 图标"
   },
   "description": {
-    "default": "Search 3400+ self-hosted service icons and insert them into your document, or set them as the document icon",
-    "zh_CN": "搜索 3400+ 自托管服务图标，一键插入正文或设为文档图标",
-    "zh-CN": "搜索 3400+ 自托管服务图标，一键插入正文或设为文档图标"
+    "default": "Search 3400+ self-hosted service icons and drop one into your document or use it as the document icon",
+    "zh_CN": "搜索 3400+ 自托管服务图标，插进正文或设为文档图标",
+    "zh-CN": "搜索 3400+ 自托管服务图标，插进正文或设为文档图标"
   },
   "readme": {
     "default": "README.md",
