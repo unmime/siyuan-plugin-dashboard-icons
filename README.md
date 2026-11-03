@@ -1,5 +1,7 @@
 # Dashboard Icons
 
+**English** · [简体中文](README_zh_CN.md)
+
 A SiYuan plugin. Searches the 3400+ self-hosted service icons in [dashboard-icons](https://github.com/homarr-labs/dashboard-icons) and drops one into your document, or sets it as the document icon.
 
 None of the art is mine. It all comes from homarr-labs/dashboard-icons, and a script here keeps up with upstream additions.

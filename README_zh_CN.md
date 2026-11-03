@@ -1,5 +1,7 @@
 # Dashboard 图标
 
+[English](README.md) · **简体中文**
+
 思源笔记插件。搜 [dashboard-icons](https://github.com/homarr-labs/dashboard-icons) 里的 3400 多个自托管服务图标，插进正文，或者设成文档图标。
 
 图标不是我画的，全部来自 homarr-labs/dashboard-icons。上游一直在加新的，这边用脚本同步。
