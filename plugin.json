@@ -1,0 +1,45 @@
+{
+  "name": "siyuan-plugin-dashboard-icons",
+  "author": "unmime",
+  "url": "https://github.com/unmime/siyuan-plugin-dashboard-icons",
+  "version": "0.1.0",
+  "minAppVersion": "3.5.0",
+  "backends": [
+    "all"
+  ],
+  "frontends": [
+    "desktop",
+    "desktop-window",
+    "browser-desktop",
+    "mobile",
+    "browser-mobile"
+  ],
+  "disabledInPublish": true,
+  "displayName": {
+    "default": "Dashboard Icons",
+    "zh_CN": "Dashboard 图标",
+    "zh-CN": "Dashboard 图标"
+  },
+  "description": {
+    "default": "Search 3400+ self-hosted service icons and insert them into your document, or set them as the document icon",
+    "zh_CN": "搜索 3400+ 自托管服务图标，一键插入正文或设为文档图标",
+    "zh-CN": "搜索 3400+ 自托管服务图标，一键插入正文或设为文档图标"
+  },
+  "readme": {
+    "default": "README.md",
+    "zh_CN": "README_zh_CN.md",
+    "zh-CN": "README_zh_CN.md"
+  },
+  "icon": "icon.png",
+  "preview": "preview.png",
+  "keywords": [
+    "图标",
+    "icon",
+    "dashboard icons",
+    "self-hosted",
+    "nas",
+    "docker",
+    "应用图标",
+    "logo"
+  ]
+}
