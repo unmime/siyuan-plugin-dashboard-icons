@@ -71,6 +71,16 @@ const STYLE = `
 .dicon-more{grid-column:1/-1;text-align:center;padding:10px;font-size:12px;color:var(--b3-theme-on-surface-light)}
 .dicon-statusbar{display:flex;align-items:center;justify-content:center;padding:0 4px;cursor:pointer}
 .dicon-statusbar svg{width:14px;height:14px;display:block}
+/* 表情面板里的 Dashboard 图标 tab */
+.dicon-emoji-tab{flex:0 0 auto;margin:0 2px;color:var(--b3-theme-on-surface);transition:color .12s}
+.dicon-emoji-tab:hover,.dicon-emoji-tab.block__icon--active{color:var(--b3-theme-primary)}
+.dicon-emoji-tab svg{width:16px;height:16px;display:block;fill:currentColor}
+.dicon-ep{display:flex;flex-direction:column;flex:1;min-height:0}
+.dicon-ep-grid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:2px;align-content:start;padding:2px 6px 8px}
+.dicon-ep-item{display:flex;align-items:center;justify-content:center;height:48px;border-radius:6px;cursor:pointer;transition:background .12s}
+.dicon-ep-item:hover{background:var(--b3-list-hover)}
+.dicon-ep-item img{width:28px;height:28px;object-fit:contain;display:block;pointer-events:none}
+.dicon-ep-empty{grid-column:1/-1;text-align:center;padding:40px 0;font-size:12px;color:var(--b3-theme-on-surface-light)}
 `;
 
 class DashboardIconsPlugin extends Plugin {
@@ -131,6 +141,7 @@ class DashboardIconsPlugin extends Plugin {
             console.error("dashboard-icons toolbar failed", err);
         }
 
+        this.injectEmojiTab();
         this.syncInjections();
 
         try {
@@ -150,6 +161,10 @@ class DashboardIconsPlugin extends Plugin {
     }
 
     onunload() {
+        if (this.emojiTabObserver) {
+            this.emojiTabObserver.disconnect();
+            this.emojiTabObserver = null;
+        }
         this.closePanel();
         this.syncInjections(true);
         const style = document.getElementById(STYLE_ID);
@@ -923,6 +938,165 @@ class DashboardIconsPlugin extends Plugin {
             this.statusElement.remove();
             this.statusElement = null;
         }
+    }
+
+    /**
+     * 把 Dashboard 图标做成表情面板里的一个 tab。
+     *
+     * 表情面板是动态创建的，没有插件 API 可插入，只能用 MutationObserver 盯着。
+     * 3450 个图标全部渲染会拖垮面板，所以默认只显示最近用过的，
+     * 其余靠搜索，单次最多渲染 EP_LIMIT 个。
+     */
+    injectEmojiTab() {
+        const EP_LIMIT = 120;
+
+        const inject = () => {
+            document.querySelectorAll(".emojis__tabheader").forEach((header) => {
+                if (header.querySelector(".dicon-emoji-tab")) return;
+                const dialog = header.closest(".b3-dialog");
+                const body = dialog && dialog.querySelector(".emojis__tabbody");
+                const linkTab = header.querySelector('[data-type="tab-link"]');
+                if (!body || !linkTab) return;
+
+                const tab = document.createElement("div");
+                tab.className = "dicon-emoji-tab ariaLabel block__icon block__icon--show";
+                tab.setAttribute("data-type", "tab-dash");
+                tab.setAttribute("aria-label", this.i18n.pluginName);
+                tab.innerHTML = '<svg><use xlink:href="#iconDashIcons"></use></svg>';
+
+                const pane = document.createElement("div");
+                pane.className = "fn__none dicon-ep";
+                pane.setAttribute("data-type", "tab-dash");
+                pane.innerHTML = `
+                    <div class="fn__hr"></div>
+                    <div class="fn__flex">
+                        <span class="fn__space"></span>
+                        <label class="b3-form__icon fn__flex-1" style="overflow:initial;">
+                            <svg class="b3-form__icon-icon"><use xlink:href="#iconSearch"></use></svg>
+                            <input spellcheck="false" class="b3-form__icon-input b3-text-field fn__block dicon-ep-search" placeholder="${this.esc(this.i18n.searchPlaceholder)}">
+                        </label>
+                        <span class="fn__space"></span>
+                    </div>
+                    <div class="fn__hr"></div>
+                    <div class="dicon-ep-grid"></div>
+                `;
+
+                const input = pane.querySelector(".dicon-ep-search");
+                const grid = pane.querySelector(".dicon-ep-grid");
+                let keyword = "";
+                let built = false;
+
+                // 这个面板是「设图标」还是「插正文」打开的：垃圾桶只在非 insert 时显示
+                const isIconMode = () => {
+                    const rm = dialog.querySelector('[data-action="remove"]');
+                    return !!rm && !rm.classList.contains("fn__none");
+                };
+
+                const pool = () => {
+                    const kw = keyword.trim().toLowerCase();
+                    if (!kw) {
+                        // 没输入时给最近用过的，避免一次渲染几千个
+                        const recent = (this.recent || []).slice(0, 24);
+                        if (recent.length) return recent;
+                        return this.icons.slice(0, 60);
+                    }
+                    const hit = this.icons.filter(
+                        (it) =>
+                            (it.n || "").toLowerCase().includes(kw) ||
+                            (it.s || "").toLowerCase().includes(kw) ||
+                            (it.a || "").toLowerCase().includes(kw) ||
+                            (it.c || []).some((t) => String(t).toLowerCase().includes(kw))
+                    );
+                    return hit.slice(0, EP_LIMIT);
+                };
+
+                const render = () => {
+                    const list = pool();
+                    if (!list.length) {
+                        grid.innerHTML = `<div class="dicon-ep-empty">${this.esc(this.i18n.noResult)}</div>`;
+                        return;
+                    }
+                    grid.innerHTML = list
+                        .map(
+                            (it, i) => `<div class="dicon-ep-item" data-i="${i}" title="${this.esc(it.n || it.s)}">
+                                <img src="${this.esc(this.iconUrl(it))}" loading="lazy" decoding="async" alt="">
+                            </div>`
+                        )
+                        .join("");
+                    grid._list = list;
+                };
+
+                grid.addEventListener("click", async (e) => {
+                    const el = e.target.closest(".dicon-ep-item");
+                    if (!el) return;
+                    const item = (grid._list || [])[Number(el.getAttribute("data-i"))];
+                    if (!item) return;
+                    const mode = isIconMode() ? "docIcon" : "insert";
+                    dialog.remove();
+                    await this.run(item, null, mode);
+                });
+
+                // 中文输入法：组词时的回车是确认候选词，不能当提交
+                let composing = false;
+                input.addEventListener("compositionstart", () => {
+                    composing = true;
+                });
+                input.addEventListener("compositionend", () => {
+                    composing = false;
+                    keyword = input.value;
+                    render();
+                });
+                input.addEventListener("input", () => {
+                    if (composing) return;
+                    keyword = input.value;
+                    render();
+                });
+
+                const activate = async () => {
+                    header.querySelectorAll('[data-type^="tab-"]').forEach((t) => {
+                        t.classList.toggle("block__icon--active", t === tab);
+                    });
+                    [...body.children].forEach((c) => c.classList.add("fn__none"));
+                    pane.classList.remove("fn__none");
+                    if (!built) {
+                        built = true;
+                        try {
+                            await this.loadIndex();
+                        } catch (err) {
+                            /* 索引加载失败就显示空，不影响其他 tab */
+                        }
+                        render();
+                    }
+                    setTimeout(() => input.focus(), 30);
+                };
+
+                tab.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    activate();
+                });
+                header.addEventListener(
+                    "click",
+                    (e) => {
+                        const t = e.target.closest('[data-type^="tab-"]');
+                        if (t && t !== tab) tab.classList.remove("block__icon--active");
+                    },
+                    true
+                );
+
+                const space = linkTab.nextElementSibling;
+                if (space && space.classList.contains("fn__space")) {
+                    space.insertAdjacentElement("afterend", tab);
+                } else {
+                    linkTab.insertAdjacentElement("afterend", tab);
+                }
+                body.appendChild(pane);
+            });
+        };
+
+        inject();
+        this.emojiTabObserver = new MutationObserver(() => inject());
+        this.emojiTabObserver.observe(document.body, { childList: true, subtree: true });
     }
 
     esc(value) {

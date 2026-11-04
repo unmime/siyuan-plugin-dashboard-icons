@@ -10,6 +10,8 @@ None of the art is mine. It all comes from homarr-labs/dashboard-icons, and a sc
 
 ## Usage
 
+Also available as a tab inside SiYuan's emoji panel: open the emoji picker from the document icon, then click the ▦ in its header row to search in place.
+
 There's a button in the top bar, the toolbar and the breadcrumb bar. Shortcut is `⌥⇧D`.
 
 Type to search. Left click inserts the icon at the cursor. Right click gives you set-as-document-icon, copy link, and download-only.
