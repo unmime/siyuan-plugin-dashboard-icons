@@ -590,7 +590,9 @@ class DashboardIconsPlugin extends Plugin {
         const resp = await fetch("/api/file/putFile", {method: "POST", body: form});
         const json = await resp.json();
         if (json.code !== 0) throw new Error(json.msg || "putFile failed");
-        return `/emojis/${EMOJI_GROUP}/${file}`;
+        // 文档图标的 icon 属性要的是 `<组>/<文件>`，不能带 /emojis/ 前缀，
+        // 带了思源解析不到，标题栏就是一个破图标。
+        return `${EMOJI_GROUP}/${file}`;
     }
 
     /** 上传到 assets/dashboard-icons/，返回 /assets/ 路径，用于正文插图。 */
